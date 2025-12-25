@@ -1,10 +1,10 @@
 import numpy as np
 import parse_data as p_d
 from scipy import stats
+import statsmodels.formula.api as smf
 import pandas as pd
 import matplotlib.pyplot as plt
 from IPython.display import display,Markdown
-print(classical.my_function)
 df = p_d.df
 
 def display_title(s, pref='Figure', num=1, center=False):
@@ -140,6 +140,16 @@ def plot_descriptive(G1, st, ab, G3):
         ax.text(0.02, 0.92, f"({lbl})", transform=ax.transAxes)
 
     plt.show()
+
+def add_grade_group(df, threshold=10):
+    df = df.copy()
+    df['grade_group'] = np.where(df['G3'] >= threshold, 'High', 'Low')
+    return df
+
+def fit_interaction_model(df, threshold=10):
+    df2 = add_grade_group(df, threshold=threshold)
+
+    model = smf.ols('G3 ~ absences * grade_group', data=df2).fit()
 
 def figure(num):
     if num == 1:
