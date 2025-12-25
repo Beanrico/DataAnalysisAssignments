@@ -1,8 +1,11 @@
 import numpy as np
+import parse_data as p_d
 from scipy import stats
 import pandas as pd
 import matplotlib.pyplot as plt
 from IPython.display import display,Markdown
+print(classical.my_function)
+df = p_d.df
 
 def display_title(s, pref='Figure', num=1, center=False):
     ctag = 'center' if center else 'p'
@@ -137,3 +140,52 @@ def plot_descriptive(G1, st, ab, G3):
         ax.text(0.02, 0.92, f"({lbl})", transform=ax.transAxes)
 
     plt.show()
+
+def figure(num):
+    if num == 1:
+        x = df['G1']
+        y = df['G3']
+        
+        slope, intercept, r, p, _ = stats.linregress(x, y)
+        print(f"G1–G3: r = {r:.3f}, p = {p:.4f}")
+        
+        xline = np.linspace(x.min(), x.max(), 100)
+        yline = slope * xline + intercept
+        
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.scatter(x, y, alpha=0.6, edgecolor='white', linewidth=0.5)
+        ax.plot(xline, yline)
+        
+        ax.set_xlabel('G1 (first-period grade)')
+        ax.set_ylabel('G3 (final grade)')
+        ax.set_title('Figure 1. Relationship between G1 and G3')
+        
+        plt.tight_layout()
+        plt.show()
+    if num == 2:
+        df2 = add_grade_group(df, threshold=10)
+        fit_interaction_model(df, threshold=10)
+        fig, ax = plt.subplots(figsize=(6, 4))
+        colors = {'Low': 'magenta', 'High': 'cyan'}
+        
+        for grp in ['Low', 'High']:
+            sub = df2[df2['grade_group'] == grp]
+            ax.scatter(sub['absences'], sub['G3'], alpha=0.6, label=f'{grp} grades',
+                       edgecolor='white', linewidth=0.5, s=40, color=colors[grp])
+            slope, intercept, r, p, _ = stats.linregress(sub['absences'], sub['G3'])
+            print(f'{grp} group: r = {r:.3f}, p = {p:.4f}')
+            xline = np.linspace(sub['absences'].min(), sub['absences'].max(), 50)
+            yline = slope * xline + intercept
+            ax.plot(xline, yline, color=colors[grp])
+            xpos = sub['absences'].quantile(0.9)
+            ypos = sub['G3'].quantile(0.1) if grp == 'Low' else sub['G3'].quantile(0.8)
+            ax.text(xpos, ypos, f'{grp}: r = {r:.3f}', fontsize=9,
+                    bbox=dict(facecolor='white', alpha=0.7, edgecolor='none'))
+        
+        ax.set_xlabel('absences')
+        ax.set_ylabel('G3')
+        ax.set_title('Relationship between absences and final grades\nby performance group')
+        ax.legend()
+        plt.tight_layout()
+        plt.show()
+                
