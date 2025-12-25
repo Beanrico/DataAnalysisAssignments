@@ -1,16 +1,3 @@
-# machine.py
-"""
-FP-6: Machine Learning (student-mat.csv)
-
-This module provides TWO options (both validated with a held-out test set):
-
-1) Regression: predict final grade G3 (continuous)
-2) Classification: predict grade_group (High/Low) derived from G3
-
-Designed to work with your existing parse_data.py which defines p_d.df
-with columns: ['studytime', 'absences', 'G1', 'G3'].
-"""
-
 from __future__ import annotations
 
 import numpy as np
