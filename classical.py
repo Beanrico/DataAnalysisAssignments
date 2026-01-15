@@ -52,39 +52,17 @@ def separate_correlations(df, threshold=10):
     return corrs
 
 def one_way_anova_studytime(df, print_table=True):
-    """
-    一元配置 ANOVA:
-        studytime の 4 水準 (1, 2, 3, 4) で G3 の平均を比較する。
 
-    Parameters
-    ----------
-    df : pandas.DataFrame
-        少なくとも 'studytime' と 'G3' 列を含むデータフレーム。
-    print_table : bool
-        True のとき、各群の記述統計と ANOVA 結果を表示する。
-
-    Returns
-    -------
-    F : float
-        ANOVA の F 値
-    p : float
-        ANOVA の p 値
-    """
-
-    # 必要な列だけ取り出し、欠損を除去
     sub = df[['studytime', 'G3']].dropna()
 
-    # studytime ごとに G3 を集める
     groups = {}
     for level in sorted(sub['studytime'].unique()):
         vals = sub.loc[sub['studytime'] == level, 'G3'].values
         groups[int(level)] = vals
 
-    # 2 群以上ないと ANOVA できない
     if len(groups) < 2:
         raise ValueError("少なくとも 2 つ以上の studytime 水準が必要です。")
 
-    # 各群の記述統計を表示
     if print_table:
         print("studytime  n   mean(G3)   sd(G3)")
         for level, vals in groups.items():
@@ -93,7 +71,6 @@ def one_way_anova_studytime(df, print_table=True):
             print(f"{level:9d} {len(vals):3d} {mean:9.3f} {sd:9.3f}")
         print()
 
-    # 一元配置 ANOVA
     F, p = stats.f_oneway(*groups.values())
 
     if print_table:
